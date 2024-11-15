@@ -13,8 +13,7 @@ public class ApiService {
 	public ClienteDto getCliente(int id) throws IOException, InterruptedException {
 		try {
 			HttpClient client = IgnorarSSL.createHttpClientIgnoringSSL();
-			HttpRequest request = HttpRequest.newBuilder()
-					.uri(URI.create("https://localhost:7144/api/Cliente/ListarClientes/"+ id)).build();
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://localhost:7144/api/Cliente/ListarClientes/"+ id)).build();
 			
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			
@@ -23,8 +22,28 @@ public class ApiService {
 			return resposta.getDados();
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
+			return null;
 		}
 		
-		return null;
+	}
+	
+	public RespostaApiDto loginValid(LoginDto loginDto) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			String json = mapper.writeValueAsString(loginDto);
+			
+			HttpClient client = IgnorarSSL.createHttpClientIgnoringSSL();
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://localhost:7144/api/Cliente/Login"))
+					.header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(json)).build();
+			
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			
+			
+			return mapper.readValue(response.body(), RespostaApiDto.class);
+			
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
 	}
 }
